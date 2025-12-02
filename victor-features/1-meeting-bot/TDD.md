@@ -1587,7 +1587,7 @@ After investigating Calls plugin:
 
 ---
 
-## Change Log
+## Change Loggi
 
 ### 2025-01-15 - Initial Draft
 - Created comprehensive TDD for AI Meeting Assistant Bot
