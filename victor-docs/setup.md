@@ -10,36 +10,74 @@ This guide will walk you through setting up Mattermost for local development on 
    - Download: https://go.dev/dl/
    - Verify: `go version`
 
-2. **Node.js** (20.x LTS) and npm
-   - Download: https://nodejs.org/
+2. **Node.js** (via NVM - recommended)
+   - Install NVM: https://github.com/nvm-sh/nvm#installing-and-updating
+   - Then install Node.js from within the `webapp` directory: `cd webapp && nvm install`
+   - This ensures you get the correct Node.js version for Mattermost
    - Verify: `node --version` and `npm --version`
+   - **Note for zsh users**: If you get `zsh: command not found: nvm`, add to `~/.zshrc`:
+     ```bash
+     export NVM_DIR="$HOME/.nvm"
+     [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+     [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"
+     ```
 
-3. **Docker Desktop** (for database)
+3. **Docker Desktop** (for database and dependencies)
    - Download: https://www.docker.com/products/docker-desktop/
    - Verify: `docker --version` and `docker compose version`
+   - **Windows users**: Use WSL2. Install via PowerShell (as admin): `wsl --install`
+   - Make sure Docker has virtual file share access to your repository directory
 
 4. **Git**
    - Download: https://git-scm.com/downloads
    - Verify: `git --version`
 
+5. **Make**
+   - macOS/Linux: Usually pre-installed
+   - Ubuntu/Debian: `sudo apt install build-essential`
+   - Windows: Install via Chocolatey: `choco install make` (or use WSL)
+
 ### Recommended Tools
 
-- **Make** (usually pre-installed on macOS/Linux, Windows users need to install)
-  - Windows: Install via Chocolatey: `choco install make`
 - **Code Editor**: VS Code or Cursor
 - **PostgreSQL Client** (optional, for database inspection): Postico, TablePlus, or pgAdmin
 
+### System Configuration
+
+**Increase file descriptors limit** (required):
+```bash
+# Add to your shell initialization file (~/.bashrc, ~/.zshrc, etc.)
+ulimit -n 8096
+```
+
+**Install libpng** (required):
+```bash
+# macOS (via Homebrew)
+brew install libpng
+
+# Ubuntu/Debian
+sudo apt-get install libpng-dev
+
+# ARM-based Mac users: Install Rosetta (required for libpng)
+softwareupdate --install-rosetta
+```
+
 ---
 
-## Step 1: Clone the Repository
+## Step 1: Fork and Clone the Repository
+
+1. **Fork the repository** on GitHub: https://github.com/mattermost/mattermost
+
+2. **Clone your fork**:
 ```bash
-# Clone the main Mattermost repository
-git clone https://github.com/mattermost/mattermost.git
+git clone https://github.com/YOUR_GITHUB_USERNAME/mattermost.git
 cd mattermost
 
 # Create your feature branch
 git checkout -b your-feature-name
 ```
+
+**Note**: If you're creating a derivative version, you must comply with AGPLv2 license requirements and replace Mattermost branding per the trademark policy.
 
 **Repository Structure**:
 ```
@@ -132,31 +170,46 @@ Key settings to verify/modify:
 ---
 
 ## Step 4: Build and Run the Server
+
 ```bash
 # From the server/ directory
+cd server
 
-# Install Go dependencies
-go mod download
-
-# Build the server
-make build-server
-
-# Run database migrations
-make run-server migrate
-
-# Start the server
+# Start the server (this will also start Docker dependencies)
 make run-server
-
-# OR use this single command that does it all:
-make run
 ```
 
-The server will start on `http://localhost:8065`
+The server will start on `http://localhost:8065` and automatically:
+- Start Docker containers (postgres, redis, etc.)
+- Build the server
+- Run database migrations
+- Start the server process
 
 **Expected Output**:
 ```
 {"level":"info","msg":"Server is listening on :8065"}
 {"level":"info","msg":"Starting Server..."}
+```
+
+**Test your environment**:
+```bash
+curl http://localhost:8065/api/v4/system/ping
+```
+
+Expected response:
+```json
+{"AndroidLatestVersion":"","AndroidMinVersion":"","DesktopLatestVersion":"","DesktopMinVersion":"","IosLatestVersion":"","IosMinVersion":"","status":"OK"}
+```
+
+**Set up admin user** (optional, but recommended):
+```bash
+# From the project root
+bin/mmctl user create --local --email admin@example.com --username admin --password password123 --system-admin
+```
+
+**Populate with sample data** (optional):
+```bash
+bin/mmctl sampledata
 ```
 
 ### Troubleshooting Server Issues
@@ -186,40 +239,50 @@ docker compose restart postgres
 
 ## Step 5: Build and Run the Web App
 
+**Important**: The web app isn't exposed directly - it's served via the server. Both server and web app must be running, and you access everything through `http://localhost:8065` (the server's port).
+
 Open a **new terminal window** (keep the server running in the first).
+
 ```bash
 # From the project root
 cd webapp
+
+# Install Node.js version (if using NVM - recommended)
+nvm install
 
 # Install npm dependencies (this takes a few minutes)
 npm install
 
 # Start the development server
-npm run dev
+make run
+# OR alternatively: npm run dev-server
 ```
 
-The web app will start on `http://localhost:8065` and proxy API requests to the server.
+The web app will start and proxy API requests to the server running on port 8065.
 
 **Expected Output**:
 ```
-VITE v4.x.x ready in XXX ms
-➜ Local:   http://localhost:8065/
+Webpack dev server starting...
+Local:   http://localhost:8065/
 ```
+
+**Note**: The web app runs on the same port as the server (8065) because it's proxied through the server.
 
 ---
 
-## Step 6: Create Your First Account
+## Step 6: Access the Web App
 
 1. Open browser to `http://localhost:8065`
-2. Click **"Create an account"**
-3. Fill in:
-   - Email: `admin@example.com`
-   - Username: `admin`
-   - Password: `password123`
-4. Click **"Create Account"**
-5. You'll be prompted to create a team - create one (e.g., "Dev Team")
+2. If you created an admin user via mmctl (Step 4), log in with those credentials
+3. If not, you'll see the account creation screen:
+   - Click **"Create an account"**
+   - Fill in email, username, and password (must be 8+ characters)
+   - Click **"Create Account"**
+   - Create a team (e.g., "Dev Team")
 
 **First user is automatically a System Admin** with full permissions.
+
+**Alternative**: You can also add `http://localhost:8065` to the Mattermost desktop app.
 
 ---
 
@@ -268,11 +331,28 @@ make restart-server
 
 **Frontend (React) Changes**:
 ```bash
-# Webpack dev server auto-reloads
+# Webpack dev server auto-reloads automatically
 # If you see issues, restart:
 cd webapp
-npm run dev
+make run
+# OR: npm run dev-server
 ```
+
+### Stopping Services
+
+**Stop the server**:
+```bash
+cd server
+make stop-server
+```
+
+**Stop Docker containers** (separate command):
+```bash
+cd server
+make stop-docker
+```
+
+**Note**: `stop-server` does NOT stop Docker containers. Use `stop-docker` for that.
 
 ### Running Tests
 
@@ -286,6 +366,15 @@ make test-server
 ```bash
 cd webapp
 npm run test
+```
+
+### Customizing Behavior
+
+You can customize server behavior by creating `server/config.override.mk`:
+```bash
+cd server
+cp config.mk config.override.mk
+# Edit config.override.mk to set options like MM_NO_DOCKER=true
 ```
 
 ---
@@ -307,7 +396,8 @@ make check-style       # Check code style
 
 From `webapp/` directory:
 ```bash
-npm run dev            # Start dev server
+make run               # Start dev server (recommended)
+npm run dev-server     # Alternative: Start dev server
 npm run build          # Production build
 npm run test           # Run tests
 npm run lint           # Lint code
@@ -478,19 +568,41 @@ export MM_LOGSETTINGS_CONSOLELEVEL=DEBUG
 ## Quick Reference Commands
 ```bash
 # Start everything
-docker compose up -d postgres
-cd server && make run &
-cd webapp && npm run dev
+cd server && make run-server    # Starts server + Docker dependencies
+cd webapp && make run            # Starts web app (in separate terminal)
 
 # Stop everything
-pkill -f mattermost
-docker compose down
+cd server
+make stop-server                 # Stops server
+make stop-docker                 # Stops Docker containers
 
 # Reset everything
-docker compose down -v
-rm -rf server/data
-dropdb mattermost_test && createdb mattermost_test
+cd server
+make stop-docker
+docker compose down -v          # Remove volumes (deletes data)
+rm -rf data                      # Remove local data directory
 ```
+
+## Development Without Docker
+
+If you prefer not to use Docker:
+
+1. Copy `server/config.mk` to `server/config.override.mk`
+2. Set `MM_NO_DOCKER=true` in `config.override.mk`
+3. Install PostgreSQL locally and create database manually:
+   ```bash
+   psql postgres
+   CREATE ROLE mmuser WITH LOGIN PASSWORD 'mostest';
+   ALTER ROLE mmuser CREATEDB;
+   \q
+   psql postgres -U mmuser
+   CREATE DATABASE mattermost_test;
+   \q
+   psql postgres
+   GRANT ALL PRIVILEGES ON DATABASE mattermost_test TO mmuser;
+   \q
+   ```
+4. Continue with normal setup steps
 
 ---
 
