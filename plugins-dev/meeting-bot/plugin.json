@@ -12,6 +12,30 @@
       "darwin-arm64": "server/dist/plugin-darwin-arm64",
       "windows-amd64": "server/dist/plugin-windows-amd64.exe"
     }
+  },
+  "settings_schema": {
+    "header": "Configure the Meeting Assistant Bot plugin. You'll need an OpenAI API key to use transcription and summarization features.",
+    "footer": "For more information, visit the plugin documentation.",
+    "settings": [
+      {
+        "key": "OpenAIAPIKey",
+        "display_name": "OpenAI API Key:",
+        "type": "text",
+        "help_text": "Enter your OpenAI API key. This key is used for Whisper (transcription) and GPT-4o (summarization) APIs. The key should start with 'sk-'.",
+        "placeholder": "sk-...",
+        "default": null,
+        "secret": true
+      },
+      {
+        "key": "EnableDebugLogging",
+        "display_name": "Enable Debug Logging:",
+        "type": "bool",
+        "help_text": "When enabled, the plugin will log additional debug information. Useful for troubleshooting.",
+        "placeholder": "",
+        "default": false,
+        "secret": false
+      }
+    ]
   }
 }
 

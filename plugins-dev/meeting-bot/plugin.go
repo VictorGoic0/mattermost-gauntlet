@@ -28,7 +28,12 @@ func (p *Plugin) OnActivate() error {
 	}
 	p.API.LogInfo("Slash command registered successfully")
 
-	// TODO: Initialize database
+	// Initialize database
+	if err := p.initDatabase(); err != nil {
+		p.API.LogError("Database initialization failed", "error", err.Error())
+		return fmt.Errorf("failed to initialize database: %w", err)
+	}
+
 	return nil
 }
 
