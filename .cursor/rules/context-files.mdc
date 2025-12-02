@@ -1,0 +1,82 @@
+Description: Context file usage and priority rules for Mattermost feature development
+Globs: victor-context/**/*.md, victor-features/**/*.md
+
+# Context File Usage Rules
+
+## When Starting Work on a Feature
+
+ALWAYS load the appropriate context files FIRST before beginning any coding or analysis:
+
+1. **Core Context**: Always load ALL files in `victor-context/core/`
+   - These contain fundamental Mattermost architecture and patterns
+   - Required for understanding the codebase structure
+
+2. **Feature Context**: Load the specific feature context file
+   - Path: `victor-context/{feature-name}/context.md`
+   - Example: `victor-context/1-meeting-bot/context.md`
+   - Contains feature-specific architecture, patterns, and gotchas
+
+3. **Refer to context files for**:
+   - Architecture understanding
+   - Code patterns and conventions
+   - Relevant file locations
+   - Common gotchas and pitfalls
+   - Key functions and APIs
+   - Database schema information
+
+## Context File Priority
+
+When generating responses or making decisions, use this priority order:
+
+1. **Context files** (HIGHEST PRIORITY)
+   - Core context files in `victor-context/core/`
+   - Feature-specific context in `victor-context/{feature-name}/`
+   - These are curated knowledge, not code dumps
+
+2. **Actual codebase files**
+   - Read files directly when context doesn't have the answer
+   - Use semantic search to find relevant code
+
+3. **External documentation**
+   - Mattermost official docs
+   - Third-party library documentation
+
+4. **General knowledge**
+   - Use only when above sources don't provide answers
+
+## Keeping Context Fresh
+
+- **Update context immediately** when you learn something important:
+  - Add to "WORKING NOTES" section right away
+  - Don't wait - capture insights while they're fresh
+  - Promote important notes to main sections during daily review
+
+- **Review context at start of each day**:
+  - Read through relevant context files
+  - Check "WORKING NOTES" for recent discoveries
+  - Update "LAST UPDATED" timestamp when making changes
+
+- **Code is source of truth**:
+  - If context contradicts actual code, UPDATE THE CONTEXT
+  - Context should reflect reality, not outdated assumptions
+  - When in doubt, verify against the codebase
+
+## Context File Structure
+
+Context files follow this template structure:
+- Feature Overview
+- Architecture Map
+- Codebase Locations
+- Code Patterns & Conventions
+- Key Functions & APIs
+- Database Schema
+- External Documentation Links
+- Working Notes (for temporary discoveries)
+- Last Updated timestamp
+
+## Implementation Notes
+
+- Context files are in `victor-context/` directory
+- Feature folders use naming like `1-meeting-bot`, `2-smart-notifications`, etc.
+- Always check for both core and feature context before starting work
+- If a context file doesn't exist for a feature, consider creating one using the template in `victor-context/context-template.md`
