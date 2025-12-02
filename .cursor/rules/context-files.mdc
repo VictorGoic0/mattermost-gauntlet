@@ -74,6 +74,29 @@ Context files follow this template structure:
 - Working Notes (for temporary discoveries)
 - Last Updated timestamp
 
+## What Goes Where
+
+### Feature-Specific Context (`victor-context/{feature-name}/context.md`)
+- Feature-specific architecture and data flow
+- Feature-specific code patterns and gotchas
+- Feature-specific file locations and functions
+- Feature-specific database tables and schemas
+- External dependencies specific to this feature
+
+**Example**: For `1-meeting-bot`, include WebRTC integration patterns, Whisper API usage, meeting recording flow
+
+### Core Context (`victor-context/core/context.md`)
+- Universal Mattermost patterns (plugin system, API conventions)
+- Reusable across multiple features
+- Fundamental architecture that applies broadly
+- Common database access patterns
+- WebSocket/real-time communication patterns
+
+**Example**: How plugins register hooks (applies to all plugins), how to create posts via API (applies to all bots)
+
+### When Unsure
+**ALWAYS ASK** if you're uncertain whether something belongs in feature context or core context. Don't guess - the user will decide and we'll update the rule if needed.
+
 ## Implementation Notes
 
 - Context files are in `victor-context/` directory

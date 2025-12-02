@@ -20,7 +20,9 @@ web/static/js/libs*.js
 
 config/active.dat
 config/logging.json
-/plugins
+# Ignore plugins directory (extracted plugins managed by Mattermost)
+# Source code is in plugins-dev/meeting-bot/ (tracked in git)
+plugins/*
 
 # go.work file
 go.work

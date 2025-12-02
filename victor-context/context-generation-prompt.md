@@ -1,9 +1,21 @@
+# Context File Generation
+
+## Important: Iterative Approach
+
+**We ARE creating all the sections** (the structure exists from the template).
+
+**But we fill them in WHEN WE GET THERE / AS NEEDED** during implementation, not upfront.
+
+As you work through tasks, fill in the relevant sections when you encounter them. Don't try to predict everything - let the implementation guide what goes in context.
+
+---
+
 I'm creating a semantic context file to help you understand the Mattermost 
 codebase for building an AI Meeting Assistant Bot plugin.
 
 I have a template at context/features/meeting-bot/context.md
 
-Your task: Fill in this template following these rules:
+Your task: Fill in this template following these rules (as you encounter each section):
 
 1. FEATURE OVERVIEW section:
    - Explain we're building a bot that joins voice calls, transcribes audio, 
@@ -57,8 +69,7 @@ Your task: Fill in this template following these rules:
 Use the existing @codebase knowledge. Search intelligently. 
 Prioritize semantic understanding over completeness.
 
-Start with section 1 (Feature Overview). 
-Ask me to confirm before moving to next section.
+Fill in sections as you work through tasks - don't try to do everything upfront.
 ```
 
 #### Step 3: Iterative refinement (2-3 hours)
